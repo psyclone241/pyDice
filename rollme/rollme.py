@@ -11,7 +11,8 @@ class rollme:
         parser.add_argument('-t', action="store", dest="type", default='standard', help="Type of Dice, defaults to 'standard'")
         parser.add_argument('-x', action="store", dest="highrange", type=int, required=False, help="High Range")
         parser.add_argument('-y', action="store", dest="lowrange", type=int, required=False, help="Low Range")
-        parser.add_argument('-c', action="store", dest="count", type=int, required=False, help="Dice Count")
+        parser.add_argument('-c', action="store", dest="custom_config", required=False, help="Custom configuration file path")
+        parser.add_argument('-z', action="store_true", dest="override_defaults", default=False, required=False, help="Override dice types with custom types")
         parser.add_argument('-g', action="store", dest="groups", required=False, help="Groups of Dice, example: 6,4,8")
         parser.add_argument('-l', action="store", dest="labels", default='', required=False, help="Label your Groups of Dice, example: Six,Four,Eight")
         parser.add_argument('-o', action="store", dest="output", default='print', required=False, help="What kind of output do you want?")
@@ -22,13 +23,23 @@ class rollme:
         self.dice_type = args.type
         self.low_range = args.highrange
         self.high_range = args.lowrange
-        self.dice_count = args.count
+        self.custom_config = args.custom_config
+        self.override_defaults = args.override_defaults
         self.dice_groups = args.groups
         self.dice_labels = args.labels
         self.output = args.output
 
         self.dice_group_type = None
         self.dice_label_type = None
+        self.default_dice_types = {
+            '4': { 'low': 1, 'high': 4 },
+            '6': { 'low': 1, 'high': 6 },
+            '8': { 'low': 1, 'high': 8 },
+            '10': { 'low': 1, 'high': 10 },
+            '12': { 'low': 1, 'high': 12 },
+            '20': { 'low': 1, 'high': 20 },
+            'custom': { 'low': self.low_range, 'high': self.high_range }
+        }
 
         if self.dice_groups:
             dash = self.dice_groups.find('-')
@@ -57,6 +68,22 @@ class rollme:
 
         if self.dice_type == 'standard' and (self.low_range and self.high_range):
             self.dice_type = 'custom'
+
+        if self.custom_config:
+            try:
+                with open(self.custom_config, 'r') as config_file:
+                    self.custom_config = config_file.read()
+                    self.custom_config = json.loads(self.custom_config)
+
+                    for custom_dice in self.custom_config['dice_types']:
+                        this_name = custom_dice['name']
+                        if this_name in self.default_dice_types:
+                            if self.override_defaults:
+                                self.default_dice_types[this_name]['low'] = custom_dice['low']
+                                self.default_dice_types[this_name]['high'] = custom_dice['high']
+            except:
+                self.custom_config = None
+                pass
 
     def makeObject(self, data, is_error):
         break_on_comma = data.split(',')
@@ -95,6 +122,49 @@ class rollme:
             return self.makeObject(value, is_error)
         else:
             return value
+
+    def rollTheDice(self, low_range, high_range):
+        if low_range and high_range:
+            if low_range < high_range:
+                return random.randint(int(low_range),int(high_range))
+            else:
+                return 'Low range must be lower than high range'
+        else:
+            return 'No range specified'
+
+    def diceType(self, dice_type='standard', low_range=None, high_range=None):
+        if dice_type:
+            if dice_type == 'standard':
+                dice_type = '6'
+            for dice, range_info in self.default_dice_types.iteritems():
+                if dice_type == dice:
+                    if dice_type == 'custom':
+                        if low_range and high_range:
+                            return self.rollTheDice(range_info['low'], range_info['high'])
+                        else:
+                            return 'Both ranges (high & low) were not specified'
+                    else:
+                        return self.rollTheDice(range_info['low'], range_info['high'])
+                else:
+                    if self.custom_config:
+                        if 'dice_types' in self.custom_config:
+                            for custom_dice in self.custom_config['dice_types']:
+                                if 'name' in custom_dice:
+                                    custom_name = custom_dice['name']
+                                    if custom_name == dice_type:
+                                        if 'low' in custom_dice and 'high' in custom_dice:
+                                            low = custom_dice['low']
+                                            high = custom_dice['high']
+                                            if low and low > 0 and high and high > 0:
+                                                return self.rollTheDice(low, high)
+                                            else:
+                                                return 'Missing a low or high for custom dice: ' + custom_name
+                                        else:
+                                            return 'No low and high for custom dice: ' + custom_name
+
+            return 'Dice type specified is not available'
+        else:
+            return 'No dice type specified'
 
     def main(self):
         if self.dice_action == 'standard':
@@ -150,39 +220,6 @@ class rollme:
                     return self.makeOutput(roll_value)
             else:
                 return 'No dice'
-
-    def rollTheDice(self, low_range, high_range):
-        if low_range and high_range:
-            if low_range < high_range:
-                return random.randint(int(low_range),int(high_range))
-            else:
-                return 'Low range must be lower than high range'
-        else:
-            return 'No range specified'
-
-    def diceType(self, dice_type, low_range=None, high_range=None):
-        if dice_type:
-            if dice_type == '4':
-                return self.rollTheDice(1,4)
-            elif dice_type == 'standard' or dice_type == '6':
-                return self.rollTheDice(1,6)
-            elif dice_type == '8':
-                return self.rollTheDice(1,8)
-            elif dice_type == '10':
-                return self.rollTheDice(1,10)
-            elif dice_type == '12':
-                return self.rollTheDice(1,12)
-            elif dice_type == '20':
-                return self.rollTheDice(1,20)
-            elif dice_type == 'custom':
-                if low_range and high_range:
-                    return self.rollTheDice(low_range, high_range)
-                else:
-                    return 'Both ranges (high & low) were not specified'
-            else:
-                return 'Dice type specified is not available'
-        else:
-            return 'No dice type specified'
 
 if __name__ == '__main__':
     myapp = rollme()

@@ -1,5 +1,7 @@
 README
 setup.py
+rollme/__init__.py
+rollme/rollme.py
 rollme.egg-info/PKG-INFO
 rollme.egg-info/SOURCES.txt
 rollme.egg-info/dependency_links.txt

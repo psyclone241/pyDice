@@ -2,8 +2,8 @@ from setuptools import setup
 
 setup(
     name='rollme',
-    version='0.0.3',
-    scripts=['rollme'],
+    version='0.0.4',
+    packages=['rollme'],
     author='Roy Keyes',
     author_email='keyes.roy@gmail.com',
     url='https://github.com/psyclone241/rollme',

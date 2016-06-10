@@ -20,4 +20,4 @@ Python Script for Tossing the Dice
 * `make rollcustomgroup GROUP=3-custom X=1 Y=99` or `make rollcustomgroup GROUP=4,6,custom X=1 Y=99`
 
 ## Usage as PIP installed Library
-* Use [Sample Script](sample.py)
+* Use !(Sample Script)[sample.py]

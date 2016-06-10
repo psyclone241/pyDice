@@ -140,7 +140,7 @@ class rollme:
                         if counter > 0:
                             roll_value += ','
 
-                        if dice_label_type == 'blank':
+                        if self.dice_label_type == 'blank':
                             roll_value += "{}"
                         else:
                             roll_value += label + ':' + self.dice_type + ':{}'

@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='rollme',
-    version='0.0.1',
+    version='0.0.3',
     scripts=['rollme'],
     author='Roy Keyes',
     author_email='keyes.roy@gmail.com',

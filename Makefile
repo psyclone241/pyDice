@@ -24,28 +24,28 @@ venv:
 	@virtualenv venv
 
 roll4:
-	@python dice.py -t 4
+	@python rollme.py -t 4
 
 roll6:
-	@python dice.py -t 6
+	@python rollme.py -t 6
 
 roll8:
-	@python dice.py -t 8
+	@python rollme.py -t 8
 
 roll10:
-	@python dice.py -t 10
+	@python rollme.py -t 10
 
 roll12:
-	@python dice.py -t 12
+	@python rollme.py -t 12
 
 roll20:
-	@python dice.py -t 20
+	@python rollme.py -t 20
 
 rollcustom:
-	@python dice.py -t custom -x $$X -y $$Y
+	@python rollme.py -t custom -x $$X -y $$Y
 
 rollgroup:
-	@python dice.py -a group -g $$GROUP
+	@python rollme.py -a group -g $$GROUP
 
 rollcustomgroup:
-	@python dice.py -a group -g $$GROUP -x $$X -y $$Y
+	@python rollme.py -a group -g $$GROUP -x $$X -y $$Y

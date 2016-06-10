@@ -127,12 +127,12 @@ class rollme:
                     roll_value = roll_value.format(*self.dice_groups)
                     return self.makeOutput(roll_value)
                 elif self.dice_group_type == 'block':
-                    self.dice_type = self.dice_groups[1]
+                    dice_type = self.dice_groups[1]
                     range_high = (int(self.dice_groups[0])+1)
                     self.dice_groups = []
                     for entry in range(1, range_high):
                         entry_string = p.number_to_words(entry)
-                        self.dice_groups.insert(counter, self.diceType(self.dice_type, self.low_range, self.high_range))
+                        self.dice_groups.insert(counter, self.diceType(dice_type, self.low_range, self.high_range))
                         label = entry_string.capitalize()
                         if self.dice_labels:
                             if 0 <= counter and counter < len(self.dice_labels):

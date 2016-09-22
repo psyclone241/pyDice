@@ -4,42 +4,62 @@ import argparse
 import inflect
 import json
 
-class rollme:
+class rollmeConfig:
     def __init__(self):
-        parser = argparse.ArgumentParser(description='Generate a random number from some parameters')
-        parser.add_argument('-a', action="store", dest="action", default='standard', help="Type of Dice Action, defaults to 'standard'")
-        parser.add_argument('-t', action="store", dest="type", default='standard', help="Type of Dice, defaults to 'standard'")
-        parser.add_argument('-x', action="store", dest="highrange", type=int, required=False, help="High Range")
-        parser.add_argument('-y', action="store", dest="lowrange", type=int, required=False, help="Low Range")
-        parser.add_argument('-c', action="store", dest="custom_config", required=False, help="Custom configuration file path")
-        parser.add_argument('-z', action="store_true", dest="override_defaults", default=False, required=False, help="Override dice types with custom types")
-        parser.add_argument('-g', action="store", dest="groups", required=False, help="Groups of Dice, example: 6,4,8")
-        parser.add_argument('-l', action="store", dest="labels", default='', required=False, help="Label your Groups of Dice, example: Six,Four,Eight")
-        parser.add_argument('-o', action="store", dest="output", default='print', required=False, help="What kind of output do you want?")
-
-        args = parser.parse_args()
-
-        self.dice_action = args.action
-        self.dice_type = args.type
-        self.low_range = args.highrange
-        self.high_range = args.lowrange
-        self.custom_config = args.custom_config
-        self.override_defaults = args.override_defaults
-        self.dice_groups = args.groups
-        self.dice_labels = args.labels
-        self.output = args.output
-
+        self.dice_action = None
+        self.dice_type = None
+        self.low_range = None
+        self.high_range = None
+        self.custom_config = {}
+        self.override_defaults = None
+        self.dice_groups = None
+        self.dice_labels = None
+        self.output = None
         self.dice_group_type = None
         self.dice_label_type = None
-        self.default_dice_types = {
-            '4': { 'low': 1, 'high': 4 },
-            '6': { 'low': 1, 'high': 6 },
-            '8': { 'low': 1, 'high': 8 },
-            '10': { 'low': 1, 'high': 10 },
-            '12': { 'low': 1, 'high': 12 },
-            '20': { 'low': 1, 'high': 20 },
-            'custom': { 'low': self.low_range, 'high': self.high_range }
-        }
+        self.default_dice_types = None
+
+class rollme:
+    def __init__(self, arg_parse=False):
+        if arg_parse:
+            parser = argparse.ArgumentParser(description='Generate a random number from some parameters')
+            parser.add_argument('-a', action="store", dest="action", default='standard', help="Type of Dice Action, defaults to 'standard'")
+            parser.add_argument('-t', action="store", dest="type", default='standard', help="Type of Dice, defaults to 'standard'")
+            parser.add_argument('-x', action="store", dest="highrange", type=int, required=False, help="High Range")
+            parser.add_argument('-y', action="store", dest="lowrange", type=int, required=False, help="Low Range")
+            parser.add_argument('-c', action="store", dest="custom_config", required=False, help="Custom configuration file path")
+            parser.add_argument('-z', action="store_true", dest="override_defaults", default=False, required=False, help="Override dice types with custom types")
+            parser.add_argument('-g', action="store", dest="groups", required=False, help="Groups of Dice, example: 6,4,8")
+            parser.add_argument('-l', action="store", dest="labels", default='', required=False, help="Label your Groups of Dice, example: Six,Four,Eight")
+            parser.add_argument('-o', action="store", dest="output", default='print', required=False, help="What kind of output do you want?")
+
+            args = parser.parse_args()
+
+            self.config_object = rollmeConfig()
+
+            self.config_object.dice_action = args.action
+            self.config_object.dice_type = args.type
+            self.config_object.low_range = args.highrange
+            self.config_object.high_range = args.lowrange
+            self.config_object.custom_config = args.custom_config
+            self.config_object.override_defaults = args.override_defaults
+            self.config_object.dice_groups = args.groups
+            self.config_object.dice_labels = args.labels
+            self.config_object.output = args.output
+
+            self.config_object.dice_group_type = None
+            self.config_object.dice_label_type = None
+            self.config_object.default_dice_types = {
+                '4': { 'low': 1, 'high': 4 },
+                '6': { 'low': 1, 'high': 6 },
+                '8': { 'low': 1, 'high': 8 },
+                '10': { 'low': 1, 'high': 10 },
+                '12': { 'low': 1, 'high': 12 },
+                '20': { 'low': 1, 'high': 20 },
+                'custom': { 'low': self.low_range, 'high': self.high_range }
+            }
+        else:
+
 
         if self.dice_groups:
             dash = self.dice_groups.find('-')

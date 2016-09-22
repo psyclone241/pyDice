@@ -24,14 +24,14 @@ class rollme:
         if input_config_object:
             self.config_object = rollmeConfig()
 
-            self.config_object.dice_action = input_config_object.action
-            self.config_object.dice_type = input_config_object.type
-            self.config_object.low_range = input_config_object.highrange
-            self.config_object.high_range = input_config_object.lowrange
+            self.config_object.dice_action = input_config_object.dice_action
+            self.config_object.dice_type = input_config_object.dice_type
+            self.config_object.low_range = input_config_object.high_range
+            self.config_object.high_range = input_config_object.low_range
             self.config_object.custom_config = input_config_object.custom_config
             self.config_object.override_defaults = input_config_object.override_defaults
-            self.config_object.dice_groups = input_config_object.groups
-            self.config_object.dice_labels = input_config_object.labels
+            self.config_object.dice_groups = input_config_object.dice_groups
+            self.config_object.dice_labels = input_config_object.dice_labels
             self.config_object.output = input_config_object.output
 
             self.config_object.dice_group_type = None

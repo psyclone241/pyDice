@@ -126,6 +126,8 @@ class rollme:
                 except:
                     self.config_object.custom_config = None
                     pass
+    def showConfiguration(self):
+        print(self.config_object)
 
     def makeObject(self, data, is_error):
         break_on_comma = data.split(',')

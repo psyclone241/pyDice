@@ -20,8 +20,32 @@ class rollmeConfig:
         self.default_dice_types = None
 
 class rollme:
-    def __init__(self, arg_parse=False):
-        if arg_parse:
+    def __init__(self, input_config_object=False):
+        if input_config_object:
+            self.config_object = rollmeConfig()
+
+            self.config_object.dice_action = input_config_object.action
+            self.config_object.dice_type = input_config_object.type
+            self.config_object.low_range = input_config_object.highrange
+            self.config_object.high_range = input_config_object.lowrange
+            self.config_object.custom_config = input_config_object.custom_config
+            self.config_object.override_defaults = input_config_object.override_defaults
+            self.config_object.dice_groups = input_config_object.groups
+            self.config_object.dice_labels = input_config_object.labels
+            self.config_object.output = input_config_object.output
+
+            self.config_object.dice_group_type = None
+            self.config_object.dice_label_type = None
+            self.config_object.default_dice_types = {
+                '4': { 'low': 1, 'high': 4 },
+                '6': { 'low': 1, 'high': 6 },
+                '8': { 'low': 1, 'high': 8 },
+                '10': { 'low': 1, 'high': 10 },
+                '12': { 'low': 1, 'high': 12 },
+                '20': { 'low': 1, 'high': 20 },
+                'custom': { 'low': self.config_object.low_range, 'high': self.config_object.high_range }
+            }
+        else:
             parser = argparse.ArgumentParser(description='Generate a random number from some parameters')
             parser.add_argument('-a', action="store", dest="action", default='standard', help="Type of Dice Action, defaults to 'standard'")
             parser.add_argument('-t', action="store", dest="type", default='standard', help="Type of Dice, defaults to 'standard'")
@@ -56,53 +80,51 @@ class rollme:
                 '10': { 'low': 1, 'high': 10 },
                 '12': { 'low': 1, 'high': 12 },
                 '20': { 'low': 1, 'high': 20 },
-                'custom': { 'low': self.low_range, 'high': self.high_range }
+                'custom': { 'low': self.config_object.low_range, 'high': self.config_object.high_range }
             }
-        else:
 
-
-        if self.dice_groups:
-            dash = self.dice_groups.find('-')
+        if self.config_object.dice_groups:
+            dash = self.config_object.dice_groups.find('-')
             if dash > -1:
-                self.dice_groups = self.dice_groups.split('-')
-                self.dice_group_type = 'block'
+                self.config_object.dice_groups = self.config_object.dice_groups.split('-')
+                self.config_object.dice_group_type = 'block'
             else:
-                self.dice_groups = self.dice_groups.split(',')
-                self.dice_group_type = 'list'
+                self.config_object.dice_groups = self.config_object.dice_groups.split(',')
+                self.config_object.dice_group_type = 'list'
 
-        if self.dice_labels:
-            dash = self.dice_labels.find('-')
-            comma = self.dice_labels.find(',')
+        if self.config_object.dice_labels:
+            dash = self.config_object.dice_labels.find('-')
+            comma = self.config_object.dice_labels.find(',')
             if dash > -1:
-                self.dice_labels = self.dice_labels.split('-')
-                self.dice_label_type = 'block'
+                self.config_object.dice_labels = self.config_object.dice_labels.split('-')
+                self.config_object.dice_label_type = 'block'
             elif comma > -1:
-                self.dice_labels = self.dice_labels.split(',')
-                self.dice_label_type = 'list'
+                self.config_object.dice_labels = self.config_object.dice_labels.split(',')
+                self.config_object.dice_label_type = 'list'
             else:
-                if self.dice_labels == 'blank':
-                    self.dice_label_type = 'blank'
+                if self.config_object.dice_labels == 'blank':
+                    self.config_object.dice_label_type = 'blank'
                 else:
-                    self.dice_labels = None
-                    self.dice_label_type = 'default'
+                    self.config_object.dice_labels = None
+                    self.config_object.dice_label_type = 'default'
 
-        if self.dice_type == 'standard' and (self.low_range and self.high_range):
-            self.dice_type = 'custom'
+        if self.config_object.dice_type == 'standard' and (self.config_object.low_range and self.config_object.high_range):
+            self.config_object.dice_type = 'custom'
 
-        if self.custom_config:
+        if self.config_object.custom_config:
             try:
-                with open(self.custom_config, 'r') as config_file:
-                    self.custom_config = config_file.read()
-                    self.custom_config = json.loads(self.custom_config)
+                with open(self.config_object.custom_config, 'r') as config_file:
+                    self.config_object.custom_config = config_file.read()
+                    self.config_object.custom_config = json.loads(self.config_object.custom_config)
 
-                    for custom_dice in self.custom_config['dice_types']:
+                    for custom_dice in self.config_object.custom_config['dice_types']:
                         this_name = custom_dice['name']
-                        if this_name in self.default_dice_types:
-                            if self.override_defaults:
-                                self.default_dice_types[this_name]['low'] = custom_dice['low']
-                                self.default_dice_types[this_name]['high'] = custom_dice['high']
+                        if this_name in self.config_object.default_dice_types:
+                            if self.config_object.override_defaults:
+                                self.config_object.default_dice_types[this_name]['low'] = custom_dice['low']
+                                self.config_object.default_dice_types[this_name]['high'] = custom_dice['high']
             except:
-                self.custom_config = None
+                self.config_object.custom_config = None
                 pass
 
     def makeObject(self, data, is_error):
@@ -134,11 +156,11 @@ class rollme:
         return json.dumps(data, indent=4)
 
     def makeOutput(self, value, is_error=False):
-        if self.output == 'print':
+        if self.config_object.output == 'print':
             print(value)
-        elif self.output == 'json':
+        elif self.config_object.output == 'json':
             print(self.makeJson(self.makeObject(value, is_error)))
-        elif self.output == 'object':
+        elif self.config_object.output == 'object':
             return self.makeObject(value, is_error)
         else:
             return value
@@ -156,7 +178,7 @@ class rollme:
         if dice_type:
             if dice_type == 'standard':
                 dice_type = '6'
-            for dice, range_info in self.default_dice_types.iteritems():
+            for dice, range_info in self.config_object.default_dice_types.iteritems():
                 if dice_type == dice:
                     if dice_type == 'custom':
                         if low_range and high_range:
@@ -166,9 +188,9 @@ class rollme:
                     else:
                         return self.rollTheDice(range_info['low'], range_info['high'])
                 else:
-                    if self.custom_config:
-                        if 'dice_types' in self.custom_config:
-                            for custom_dice in self.custom_config['dice_types']:
+                    if self.config_object.custom_config:
+                        if 'dice_types' in self.config_object.custom_config:
+                            for custom_dice in self.config_object.custom_config['dice_types']:
                                 if 'name' in custom_dice:
                                     custom_name = custom_dice['name']
                                     if custom_name == dice_type:
@@ -187,56 +209,56 @@ class rollme:
             return 'No dice type specified'
 
     def main(self):
-        if self.dice_action == 'standard':
-            roll_value = self.diceType(self.dice_type, self.low_range, self.high_range)
+        if self.config_object.dice_action == 'standard':
+            roll_value = self.diceType(self.config_object.dice_type, self.config_object.low_range, self.config_object.high_range)
             if roll_value:
                 return self.makeOutput(roll_value)
-        elif self.dice_action == 'group':
-            if self.dice_groups:
+        elif self.config_object.dice_action == 'group':
+            if self.config_object.dice_groups:
                 p = inflect.engine()
                 roll_value = ''
                 counter = 0
-                if self.dice_group_type == 'list':
-                    for entry in self.dice_groups:
+                if self.config_object.dice_group_type == 'list':
+                    for entry in self.config_object.dice_groups:
                         entry_string = p.number_to_words(entry)
-                        self.dice_groups[counter] = self.diceType(entry, self.low_range, self.high_range)
+                        self.config_object.dice_groups[counter] = self.diceType(entry, self.config_object.low_range, self.config_object.high_range)
                         label = entry_string.capitalize()
-                        if self.dice_labels:
-                            if 0 <= counter and counter < len(self.dice_labels):
-                                label = self.dice_labels[counter]
+                        if self.config_object.dice_labels:
+                            if 0 <= counter and counter < len(self.config_object.dice_labels):
+                                label = self.config_object.dice_labels[counter]
                         if counter > 0:
                             roll_value += ','
 
-                        if self.dice_label_type == 'blank':
+                        if self.config_object.dice_label_type == 'blank':
                             roll_value += "{}"
                         else:
                             roll_value += label + ':' + entry + ':{}'
 
                         counter += 1
 
-                    roll_value = roll_value.format(*self.dice_groups)
+                    roll_value = roll_value.format(*self.config_object.dice_groups)
                     return self.makeOutput(roll_value)
-                elif self.dice_group_type == 'block':
-                    dice_type = self.dice_groups[1]
-                    range_high = (int(self.dice_groups[0])+1)
-                    self.dice_groups = []
+                elif self.config_object.dice_group_type == 'block':
+                    dice_type = self.config_object.dice_groups[1]
+                    range_high = (int(self.config_object.dice_groups[0])+1)
+                    self.config_object.dice_groups = []
                     for entry in range(1, range_high):
                         entry_string = p.number_to_words(entry)
-                        self.dice_groups.insert(counter, self.diceType(dice_type, self.low_range, self.high_range))
+                        self.config_object.dice_groups.insert(counter, self.diceType(dice_type, self.config_object.low_range, self.config_object.high_range))
                         label = entry_string.capitalize()
-                        if self.dice_labels:
-                            if 0 <= counter and counter < len(self.dice_labels):
-                                label = self.dice_labels[counter]
+                        if self.config_object.dice_labels:
+                            if 0 <= counter and counter < len(self.config_object.dice_labels):
+                                label = self.config_object.dice_labels[counter]
                         if counter > 0:
                             roll_value += ','
 
-                        if self.dice_label_type == 'blank':
+                        if self.config_object.dice_label_type == 'blank':
                             roll_value += "{}"
                         else:
                             roll_value += label + ':' + self.dice_type + ':{}'
                         counter += 1
 
-                    roll_value = roll_value.format(*self.dice_groups)
+                    roll_value = roll_value.format(*self.config_object.dice_groups)
                     return self.makeOutput(roll_value)
             else:
                 return 'No dice'

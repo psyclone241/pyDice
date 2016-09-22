@@ -83,49 +83,49 @@ class rollme:
                 'custom': { 'low': self.config_object.low_range, 'high': self.config_object.high_range }
             }
 
-        if self.config_object.dice_groups:
-            dash = self.config_object.dice_groups.find('-')
-            if dash > -1:
-                self.config_object.dice_groups = self.config_object.dice_groups.split('-')
-                self.config_object.dice_group_type = 'block'
-            else:
-                self.config_object.dice_groups = self.config_object.dice_groups.split(',')
-                self.config_object.dice_group_type = 'list'
-
-        if self.config_object.dice_labels:
-            dash = self.config_object.dice_labels.find('-')
-            comma = self.config_object.dice_labels.find(',')
-            if dash > -1:
-                self.config_object.dice_labels = self.config_object.dice_labels.split('-')
-                self.config_object.dice_label_type = 'block'
-            elif comma > -1:
-                self.config_object.dice_labels = self.config_object.dice_labels.split(',')
-                self.config_object.dice_label_type = 'list'
-            else:
-                if self.config_object.dice_labels == 'blank':
-                    self.config_object.dice_label_type = 'blank'
+            if self.config_object.dice_groups:
+                dash = self.config_object.dice_groups.find('-')
+                if dash > -1:
+                    self.config_object.dice_groups = self.config_object.dice_groups.split('-')
+                    self.config_object.dice_group_type = 'block'
                 else:
-                    self.config_object.dice_labels = None
-                    self.config_object.dice_label_type = 'default'
+                    self.config_object.dice_groups = self.config_object.dice_groups.split(',')
+                    self.config_object.dice_group_type = 'list'
 
-        if self.config_object.dice_type == 'standard' and (self.config_object.low_range and self.config_object.high_range):
-            self.config_object.dice_type = 'custom'
+            if self.config_object.dice_labels:
+                dash = self.config_object.dice_labels.find('-')
+                comma = self.config_object.dice_labels.find(',')
+                if dash > -1:
+                    self.config_object.dice_labels = self.config_object.dice_labels.split('-')
+                    self.config_object.dice_label_type = 'block'
+                elif comma > -1:
+                    self.config_object.dice_labels = self.config_object.dice_labels.split(',')
+                    self.config_object.dice_label_type = 'list'
+                else:
+                    if self.config_object.dice_labels == 'blank':
+                        self.config_object.dice_label_type = 'blank'
+                    else:
+                        self.config_object.dice_labels = None
+                        self.config_object.dice_label_type = 'default'
 
-        if self.config_object.custom_config:
-            try:
-                with open(self.config_object.custom_config, 'r') as config_file:
-                    self.config_object.custom_config = config_file.read()
-                    self.config_object.custom_config = json.loads(self.config_object.custom_config)
+            if self.config_object.dice_type == 'standard' and (self.config_object.low_range and self.config_object.high_range):
+                self.config_object.dice_type = 'custom'
 
-                    for custom_dice in self.config_object.custom_config['dice_types']:
-                        this_name = custom_dice['name']
-                        if this_name in self.config_object.default_dice_types:
-                            if self.config_object.override_defaults:
-                                self.config_object.default_dice_types[this_name]['low'] = custom_dice['low']
-                                self.config_object.default_dice_types[this_name]['high'] = custom_dice['high']
-            except:
-                self.config_object.custom_config = None
-                pass
+            if self.config_object.custom_config:
+                try:
+                    with open(self.config_object.custom_config, 'r') as config_file:
+                        self.config_object.custom_config = config_file.read()
+                        self.config_object.custom_config = json.loads(self.config_object.custom_config)
+
+                        for custom_dice in self.config_object.custom_config['dice_types']:
+                            this_name = custom_dice['name']
+                            if this_name in self.config_object.default_dice_types:
+                                if self.config_object.override_defaults:
+                                    self.config_object.default_dice_types[this_name]['low'] = custom_dice['low']
+                                    self.config_object.default_dice_types[this_name]['high'] = custom_dice['high']
+                except:
+                    self.config_object.custom_config = None
+                    pass
 
     def makeObject(self, data, is_error):
         break_on_comma = data.split(',')
